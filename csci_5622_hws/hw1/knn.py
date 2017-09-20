@@ -5,7 +5,7 @@ import gzip
 from collections import Counter, defaultdict
 
 import random
-import numpy
+import numpy as np
 from numpy import median
 from sklearn.neighbors import BallTree
 
@@ -56,13 +56,44 @@ class Knearest:
         :param item_indices: The indices of the k nearest neighbors
         """
         assert len(item_indices) == self._k, "Did not get k inputs"
+        
+        tmp = []
+        for x in range(len(item_indices)):
+            tmp += [self._y[item_indices[x]]]
+        # print(tmp)
+        tmp.sort()
+        num = -1 * tmp[0]
+        large = []
+        if tmp[0] < 0:
+            for n in range(len(tmp)):
+                tmp[n] += num;
+            m = np.bincount(np.array(tmp))
+            ma = np.amax(m)
+            for i in range(len(m)):
+                if m[i] == ma:
+                    large += [i]
+            large = np.array(large)
+            ans = np.median(large) - num
 
+            # print(m)
+            # ans = np.argmax(m, axis = 0) - num 
+            # print(ans)
+        else:
+            m = np.bincount(np.array(tmp))
+            # print(m)
+            ma = np.amax(m)
+            for i in range(len(m)):
+                if m[i] == ma:
+                    large += [i]
+            large = np.array(large)
+            ans = np.median(large)
+        
         # Finish this function to return the most common y value for
         # these indices
         #
         # http://docs.scipy.org/doc/numpy/reference/generated/numpy.median.html
-
-        return self._y[item_indices[0]]
+        
+        return ans
 
     def classify(self, example):
         """
@@ -71,12 +102,12 @@ class Knearest:
         :param example: A representation of an example in the same
         format as training data
         """
-
+        x = np.array(example)
+        dist, ind = self._kdtree.query(x, self._k)
         # Finish this function to find the k closest points, query the
         # majority function, and return the value.
 
-        return self.majority(list(random.randrange(len(self._y)) \
-                                  for x in range(self._k)))
+        return self.majority(list(ind[0]))
 
     def confusion_matrix(self, test_x, test_y, debug=False):
         """
@@ -92,10 +123,15 @@ class Knearest:
         # Finish this function to build a dictionary with the
         # mislabeled examples.  You'll need to call the classify
         # function for each example.
-
-        d = defaultdict(dict)
         data_index = 0
+        d = defaultdict(dict)
+
         for xx, yy in zip(test_x, test_y):
+            predict = self.classify(xx)
+            try:
+                d[yy][predict] += 1
+            except:
+                d[yy][predict] = 1
             data_index += 1
             if debug and data_index % 100 == 0:
                 print("%i/%i for confusion matrix" % (data_index, len(test_x)))
@@ -133,6 +169,8 @@ if __name__ == "__main__":
 
     # You should not have to modify any of this code
 
+    print(data)
+    
     if args.limit > 0:
         print("Data limit: %i" % args.limit)
         knn = Knearest(data.train_x[:args.limit], data.train_y[:args.limit],
@@ -148,4 +186,5 @@ if __name__ == "__main__":
         print("%i:\t" % ii + "\t".join(str(confusion[ii].get(x, 0))
                                        for x in range(10)))
     print("Accuracy: %f" % knn.accuracy(confusion))
-
+    # print(data.test_y)
+    

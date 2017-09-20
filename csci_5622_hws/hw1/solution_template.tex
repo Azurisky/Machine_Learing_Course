@@ -1,0 +1,81 @@
+\documentclass[11pt]{article}
+
+% ==== PACKAGES ==== %
+% \usepackage{fullpage}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{epic}
+\usepackage{eepic}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{color}
+\usepackage[letterpaper, margin=1in]{geometry}
+
+% ==== MARGINS ==== %
+% \pagestyle{empty}
+% \setlength{\oddsidemargin}{0in}
+% \setlength{\textwidth}{6.8in}
+% \setlength{\textheight}{9.5in}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{CSCI 5622}
+\lhead{Homework 1}
+\rfoot{Page \thepage}
+
+
+\newtheorem*{solution*}{Solution}
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{theorem}[lemma]{Theorem}
+\newtheorem{claim}[lemma]{Claim}
+\newtheorem{definition}[lemma]{Definition}
+\newtheorem{corollary}[lemma]{Corollary}
+\lstset{moredelim=[is][\bfseries]{[*}{*]}}
+
+% ==== DOCUMENT PROPER ==== %
+\begin{document}
+
+\thispagestyle{empty}
+
+% --- Header Box --- %
+\newlength{\boxlength}\setlength{\boxlength}{\textwidth}
+\addtolength{\boxlength}{-4mm}
+
+\begin{center}\framebox{\parbox{\boxlength}{\bf
+      Machine Learning \hfill Homework 1\\
+      CSCI 5622 Fall 2017 \hfill Due Time Sep 15, 2017\\
+      Name: \textcolor{red}{Chi Chen} \hfill CU identitykey: \textcolor{red}{chch4713}
+}}
+\end{center}
+
+
+
+
+\section{K-nearest Neighbor (40pts)}
+
+\begin{solution*}
+	1. What is the role of the number of training instances to accuracy (hint: try different “--limit” and plot accuracy vs. number of training instances)?
+	2. What numbers get confused with each other most easily?
+	3. What is the role of k to training accuracy?
+	4. In general, does a small value for k cause “overfitting” or “underfitting”?
+\end{solution*}
+
+
+\section{Cross Validation (30pts)}
+
+\begin{solution*}
+	1. What is the best k chosen from 5-fold cross validation with “--limit 500”? 
+	2. What is the best k chosen from 5-fold cross validation “--limit 5000”?
+	3. Is the best k consistent with the best performance k in problem 1?
+\end{solution*}
+
+\section{Bias-variance tradeoff (20pts)}
+
+\begin{solution*}
+	
+\end{solution*}
+
+
+\end{document}

@@ -29,6 +29,15 @@ def split_cv(length, num_folds):
     splits = [SplitIndices([], []) for _ in range(num_folds)]
     indices = list(range(length))
     random.shuffle(indices)
+    for i in range(num_folds):
+        count = 0
+        for j in indices:
+            if count < len(indices)/num_folds:
+                splits[i][1].append(j)
+            else:
+                splits[i][0].append(j)
+            count += 1
+    
     # Finish this function to populate `folds`.
     # All the indices are split into num_folds folds.
     # Each fold is the testing set in a split, and the remaining indices
@@ -44,11 +53,24 @@ def cv_performance(x, y, num_folds, k):
     accuracy_array = []
 
     for split in splits:
+        print(split)
+        test_x, test_y, train_x, train_y = [], [], [], []
         # Finish this function to use the training instances 
         # indexed by `split.train` to train the classifier,
         # and then store the accuracy 
         # on the testing instances indexed by `split.test`
-        
+        # accuracy = knn.accuracy()
+        for i in range(len(split[1])):
+            test_x.append(x[split[1][i]])
+            test_y.append(y[split[1][i]])
+            
+        for i in range(len(split[0])):
+            train_x.append(x[split[0][i]])
+            train_y.append(y[split[0][i]])
+
+        knn = Knearest(train_x, train_y, k)
+        confusion = knn.confusion_matrix(test_x, test_y)
+        accuracy = knn.accuracy(confusion)
         accuracy_array.append(accuracy)
 
     return np.mean(accuracy_array)
