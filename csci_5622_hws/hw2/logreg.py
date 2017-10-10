@@ -88,6 +88,14 @@ class LogReg:
         :param y: The target output of the example to take the gradient with respect to
         :return: Return the new value of the regression coefficients
         """
+        # print(self.w)
+
+        # gradient = (y - sigmoid(self.w.dot(x_i))) * x_i
+        # self.w = self.w + self.eta*gradient
+
+        gradient = sigmoid(self.w.dot(x_i))
+        for i in range(len(self.w)):
+            self.w[i] = self.w[i] + self.eta*(y - gradient)*x_i[i]
 
         # TODO: Finish this function to do a single stochastic gradient descent update
         # and return the updated weight vector
@@ -106,7 +114,7 @@ def sigmoid(score, threshold=20.0):
     # TODO: Finish this function to return the output of applying the sigmoid
     # function to the input score (Please do not use external libraries)
 
-    return 1.0
+    return 1.0 / (1.0 + exp(-1*score))
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
@@ -126,9 +134,15 @@ if __name__ == "__main__":
     iteration = 0
     for epoch in range(args.passes):
         data.train_x, data.train_y = Numbers.shuffle(data.train_x, data.train_y)
-
+        for x,y in zip(data.train_x, data.train_y):
+            test = lr.sgd_update(x, y)
+        # lr.sgd_update(data.train_x, data.train_y)
         # TODO: Finish the code to loop over the training data and perform a stochastic
-        # gradient descent update on each training example.
-
+        # # gradient descent update on each training example.
+        #     if iteration % 5 == 0:
+        #         prob, accuracy = lr.progress(data.train_x, data.train_y)
+        #         prob_Test, accuracy_Test = lr.progress(data.test_x, data.test_y)
+        #         print("iter: %d | accuracy: %f/%f " % (iteration, accuracy,accuracy_Test))
+        #     iteration += 1
         # NOTE: It may be helpful to call upon the 'progress' method in the LogReg
         # class to make sure the algorithm is truly learning properly on both training and test data

@@ -4,13 +4,17 @@ from csv import DictReader, DictWriter
 
 import numpy as np
 from numpy import array
-
+import time
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.linear_model import SGDClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.metrics import accuracy_score
+from sklearn.decomposition import TruncatedSVD
+
+from nltk.tokenize import word_tokenize
+from nltk.tag import pos_tag
 
 SEED = 5
 
@@ -24,6 +28,7 @@ All credit goes to Matt Terry for the ItemSelector class below
 For more information:
 http://scikit-learn.org/stable/auto_examples/hetero_feature_union.html
 '''
+
 class ItemSelector(BaseEstimator, TransformerMixin):
 
     def __init__(self, key):
@@ -33,6 +38,7 @@ class ItemSelector(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, data_dict):
+
         return data_dict[self.key]
 
 
@@ -63,6 +69,50 @@ class TextLengthTransformer(BaseEstimator, TransformerMixin):
 
 # TODO: Add custom feature transformers for the movie review data
 
+class Pos_word(BaseEstimator, TransformerMixin):
+    
+    def fit(self, examples):
+        return self
+
+    def transform(self, examples):
+        features = np.zeros((len(examples), 1))
+        # Pos_word = ['good', 'perfect', 'nice', 'cool', 'normal']
+        Pos_word = ['good', 'perfect', 'nice', 'normal']
+        count = 0
+        i = 0
+        for ex in examples:
+            text = word_tokenize(ex)
+            for word in text:
+                if word in Pos_word:
+                    count += 1
+            features[i, 0] = count
+            i += 1
+            count = 0
+
+        return features    
+
+class Neg_word(BaseEstimator, TransformerMixin):
+    
+    def fit(self, examples):
+        return self
+
+    def transform(self, examples):
+        features = np.zeros((len(examples), 1))
+        Neg_word = ['bad', 'worse', 'terrible']
+        count = 0
+        i = 0
+        for ex in examples:
+            text = word_tokenize(ex)
+            for word in text:
+                if word in Neg_word:
+                    count -= 1
+            features[i, 0] = count
+            # print(count)
+            # time.sleep(1)
+            i += 1
+            count = 0
+
+        return features    
 
 class Featurizer:
     def __init__(self):
@@ -71,11 +121,38 @@ class Featurizer:
         # In this case, we are selecting the plaintext of the input data
 
         # TODO: Add any new feature transformers or other features to the FeatureUnion
+
         self.all_features = FeatureUnion([
             ('text_stats', Pipeline([
                 ('selector', ItemSelector(key='text')),
                 ('text_length', TextLengthTransformer())
-            ])),
+            ])
+            ),
+            ################################## n-grams count ##################################
+            # ('n_gram', Pipeline([
+            #     ('selector', ItemSelector(key='text')),
+            #     ('n-grams', CountVectorizer(ngram_range=(1,2))) # change the second parameter to change n 
+            # ]),
+            # ),
+
+            ################################## n-grams frequent ##################################
+            # ('n_gram_frequent', Pipeline([
+            #     ('selector', ItemSelector(key='text')),
+            #     ('n-grams', TfidfVectorizer(ngram_range=(1,1))) # change the second parameter to change n 
+            # ]),
+            # ),
+
+            ################################## Positive word count ##################################
+            # ('Pos_word', Pipeline([
+            #     ('selector', ItemSelector(key='text')),
+            #     ('Pos_word', Pos_word())
+            # ])),
+
+            ################################## Negtive word count ##################################
+            # ('Neg_word', Pipeline([
+            #     ('selector', ItemSelector(key='text')),
+            #     ('Neg_word', Neg_word())
+            # ])),
         ])
 
     def train_feature(self, examples):
@@ -125,7 +202,7 @@ if __name__ == "__main__":
     #print(set(y_train))
 
     # Train classifier
-    lr = SGDClassifier(loss='log', penalty='l2', alpha=0.0001, max_iter=15000, shuffle=True, verbose=2)
+    lr = SGDClassifier(loss='log', penalty='l2', alpha=0.0001, max_iter=5000, shuffle=True, verbose=2)
 
     lr.fit(feat_train, y_train)
     y_pred = lr.predict(feat_train)
