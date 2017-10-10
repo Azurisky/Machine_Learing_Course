@@ -41,7 +41,7 @@ class RNN:
         self.model = Sequential()
         self.model.add(Embedding(dict_size, embedding_length, input_length=example_length))
         self.model.add(LSTM(100))
-        self.model.add(Dense(1, activation='softmax'))
+        self.model.add(Dense(1, activation='sigmoid'))
         self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
         print(self.model.summary())
         self.model.fit(self.train_x, self.train_y, validation_data=(self.test_x, self.test_y), epochs=self.epoches, batch_size=self.epoches)
