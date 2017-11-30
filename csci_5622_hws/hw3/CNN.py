@@ -12,6 +12,7 @@ from keras.layers import Dropout
 from keras.layers import Flatten
 from keras.layers.core import Reshape
 from keras.utils import to_categorical
+import matplotlib.pyplot as plt
 
 import time 
 
@@ -59,12 +60,13 @@ class CNN:
         self.model.add(Conv2D(50, 3, 3))
         self.model.add(MaxPool2D(2, 2))
         self.model.add(Flatten())
-        # self.model.add(Dropout(0.5))
         self.model.add(Dense(200, activation='relu'))
         self.model.add(Dropout(0.1))
         self.model.add(Dense(100, activation='tanh'))
         self.model.add(Dropout(0.1))
         self.model.add(Dense(10, activation='softmax'))
+
+        # self.model.add(Dense(10, activation=train_model))
         self.model.compile(loss=keras.losses.categorical_crossentropy,
               optimizer=keras.optimizers.Adadelta(),
               metrics=['accuracy'])
@@ -100,9 +102,37 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     data = Numbers("../data/mnist.pkl.gz")
-
-
+    batch_size = [32, 64, 128, 256, 512]
+    model = ["sigmoid", "tanh", "softmax", "relu"]
+    # model = ['sigmoid']
+    a = []
+    b = []
+    c = []
+    d = []
+    # for i in batch_size:
+    #     for j in model:
+    #         print(i, j)
     cnn = CNN(data.train_x[:args.limit], data.train_y[:args.limit], data.test_x, data.test_y)
     cnn.train()
     acc = cnn.evaluate()
+            # if j == "sigmoid":
+            #     a += [acc[1]]
+            # elif j == "tanh":
+            #     b += [acc[1]]
+            # elif j == "softmax":
+            #     c += [acc[1]]
+            # elif j == "relu":
+            #     d += [acc[1]]
     print(acc)
+    # print(a)
+    # print(b)
+    # print(c)
+    # print(d)
+    # plt.plot(batch_size, a, label="sigmoid")
+    # plt.plot(batch_size, b, label="tanh")
+    # plt.plot(batch_size, c, label="softmax")
+    # plt.plot(batch_size, d, label="relu")
+    # plt.xlabel('Number of batch size')
+    # plt.ylabel('Accuracy')
+    # plt.legend()
+    # plt.show()

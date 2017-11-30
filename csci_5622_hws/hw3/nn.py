@@ -67,6 +67,8 @@ class Network:
                         print("Epoch {:4d}: Train {:10.5f}, Test {:10.5f}".format(epoch+1, acc_train, acc_test))
                     else:
                         print("Epoch {:4d}: Train {:10.5f}".format(epoch+1, acc_train))
+        # hidden_acc_test += [acc_test]
+        # hidden_acc_train += [acc_train]
 
     def back_prop(self, x, y):
         """
@@ -144,11 +146,21 @@ if __name__ == "__main__":
     epochs_acc_test = []
     hidden_acc_train = []
     hidden_acc_test = []
-    x_axies = []
+    x_axies = [1, 25, 50, 100, 150, 200]
     f = gzip.open('../data/tinyMNIST.pkl.gz', 'rb') # change path to ../data/tinyMNIST.pkl.gz after debugging
     u = pickle._Unpickler(f)
     u.encoding = 'latin1'
     train, test = u.load()
-    
+    # for i in x_axies:
+    #     print(i)
     nn = Network([196,100,10])
     nn.SGD_train(train, epochs=200, eta=0.25, lam=0.0, verbose=True, test=test)
+
+    # plt.plot(x_axies, hidden_acc_test, label="test")
+    # plt.plot(x_axies, hidden_acc_train, label="train")
+    # plt.xlabel('Number of hidden layers')
+    # plt.ylabel('Accuracy')
+    # plt.legend()
+    # plt.show()
+
+
